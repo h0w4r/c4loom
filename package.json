@@ -1,0 +1,28 @@
+{
+  "name": "c4loom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-first MCP server that weaves explicit architecture models into real C1-C4 diagrams.",
+  "license": "MIT",
+  "author": "h0w4r",
+  "repository": {"type": "git", "url": "https://github.com/h0w4r/c4loom.git"},
+  "homepage": "https://github.com/h0w4r/c4loom#readme",
+  "bugs": {"url": "https://github.com/h0w4r/c4loom/issues"},
+  "keywords": ["mcp", "c4-model", "structurizr", "plantuml", "architecture", "diagrams"],
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "setup": "node scripts/setup.mjs",
+    "configure": "node scripts/configure.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
+    "demo": "node scripts/demo.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "zod": "3.25.76",
+    "playwright": "1.62.1",
+    "sharp": "0.35.5"
+  }
+}

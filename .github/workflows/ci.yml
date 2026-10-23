@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-rendering:
+    name: MCP and rendering (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install exact dependencies
+        run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Cache pinned engines
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .runtime
+          key: c4loom-engines-${{ hashFiles('scripts/setup.mjs') }}
+      - name: Prepare real rendering engines
+        run: npm run setup
+      - name: Install Chromium and native browser dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Real stdio MCP and C1-C4 rendering
+        run: npm run test:e2e

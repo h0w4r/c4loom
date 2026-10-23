@@ -1,0 +1,163 @@
+{
+  "title": "C4Loom",
+  "description": "Local-first architecture-to-diagram generation over MCP.",
+  "focalSystem": "generador",
+  "people": [
+    {
+      "id": "operador",
+      "name": "Developer",
+      "description": "Requests and reviews generated architecture diagrams"
+    }
+  ],
+  "systems": [
+    {
+      "id": "generador",
+      "name": "C4Loom",
+      "description": "Creates editable sources and real diagrams from an explicit model",
+      "containers": [
+        {
+          "id": "mcp",
+          "name": "MCP server",
+          "description": "Accepts tool calls and coordinates generation",
+          "technology": "Node.js / MCP stdio",
+          "components": [
+            {
+              "id": "servidor",
+              "name": "MCP tools",
+              "description": "Exposes generation, rendering and artifact tools",
+              "technology": "server.mjs"
+            },
+            {
+              "id": "flujo",
+              "name": "Generation pipeline",
+              "description": "Persists inputs, invokes engines and verifies outputs",
+              "technology": "pipeline.mjs"
+            },
+            {
+              "id": "contrato",
+              "name": "Model compiler",
+              "description": "Validates explicit models and compiles DSL and PlantUML",
+              "technology": "model.mjs"
+            },
+            {
+              "id": "renderizador",
+              "name": "Renderer",
+              "description": "Exports transparent SVG and PNG",
+              "technology": "render.mjs / Playwright / Sharp"
+            }
+          ]
+        },
+        {
+          "id": "structurizr",
+          "name": "Structurizr engine",
+          "description": "Validates DSL and exports the native model viewer",
+          "technology": "Java 21"
+        },
+        {
+          "id": "plantuml",
+          "name": "PlantUML engine",
+          "description": "Renders code-level detail diagrams",
+          "technology": "Java / Smetana"
+        },
+        {
+          "id": "archivos",
+          "name": "Local artifacts",
+          "description": "Stores sources, images and manifests",
+          "technology": "Filesystem"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "source": "operador",
+      "target": "generador",
+      "description": "Requests diagrams"
+    },
+    {
+      "source": "operador",
+      "target": "mcp",
+      "description": "Calls tools",
+      "technology": "MCP stdio"
+    },
+    {
+      "source": "mcp",
+      "target": "structurizr",
+      "description": "Exports the model",
+      "technology": "Java subprocess"
+    },
+    {
+      "source": "mcp",
+      "target": "plantuml",
+      "description": "Renders code",
+      "technology": "Java subprocess"
+    },
+    {
+      "source": "mcp",
+      "target": "archivos",
+      "description": "Writes and reads artifacts"
+    },
+    {
+      "source": "servidor",
+      "target": "flujo",
+      "description": "Delegates generation"
+    },
+    {
+      "source": "flujo",
+      "target": "contrato",
+      "description": "Compiles the model"
+    },
+    {
+      "source": "flujo",
+      "target": "renderizador",
+      "description": "Generates images"
+    },
+    {
+      "source": "renderizador",
+      "target": "structurizr",
+      "description": "Runs the export"
+    },
+    {
+      "source": "renderizador",
+      "target": "plantuml",
+      "description": "Renders C4 views"
+    }
+  ],
+  "codeViews": [
+    {
+      "key": "compilador",
+      "component": "contrato",
+      "title": "C4 Architecture compiler modules",
+      "elements": [
+        {
+          "id": "modModelo",
+          "name": "model.mjs",
+          "kind": "module",
+          "operations": [
+            "validateModel(input, levels)",
+            "createDsl(model, levels, codeImages)",
+            "createPlantUml(view)"
+          ]
+        },
+        {
+          "id": "modFlujo",
+          "name": "pipeline.mjs",
+          "kind": "module",
+          "operations": [
+            "generate(request, context)",
+            "renderExisting(request, context)",
+            "readArtifact(path)"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "source": "modFlujo",
+          "target": "modModelo",
+          "description": "Validates and compiles",
+          "kind": "dependency"
+        }
+      ]
+    }
+  ]
+}

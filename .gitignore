@@ -1,0 +1,14 @@
+# Downloaded engines, dependencies, local configuration and generated runs.
+.runtime/
+.evidence/
+node_modules/
+*.log
+output/
+.codex/
+.local/
+.env
+.env.*
+!.env.example
+*.part
+.DS_Store
+Thumbs.db
